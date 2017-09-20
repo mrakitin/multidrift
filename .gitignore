@@ -1,0 +1,4 @@
+*.py[cd]
+.idea/
+__srwl_logs__/
+data_*/
