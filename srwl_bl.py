@@ -2011,7 +2011,11 @@ class SRWLBeamline(object):
                         wfr.dRx = _v.w_wre
                         wfr.dRy = _v.w_wre
 
-                    if _v.w_md:
+                    run_multidrifts = False
+                    if hasattr(_v, 'w_md') and _v.w_md and hasattr(_v, 'w_mde') and hasattr(_v, 'w_mds'):
+                        run_multidrifts = True
+
+                    if run_multidrifts:
                         import copy
                         import numpy as np
 
@@ -2035,7 +2039,7 @@ class SRWLBeamline(object):
                         _fname = os.path.join(_v.fdir, _v.ws_fni) if(len(_v.ws_fni) > 0) else '',
                         _det = detector)
 
-                    if _v.w_md:
+                    if run_multidrifts:
                         step_size = (multidrifts.max() - multidrifts.min()) / float(multidrifts.size - 1)
                         precision = abs(int('{:.10E}'.format(step_size).split('E')[-1]))
 
