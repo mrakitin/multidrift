@@ -2011,6 +2011,20 @@ class SRWLBeamline(object):
                         wfr.dRx = _v.w_wre
                         wfr.dRy = _v.w_wre
 
+                    if _v.w_md:
+                        import copy
+                        import numpy as np
+
+                        multidrifts = np.linspace(self.optics.arOpt[-1].L, self.optics.arOpt[-1].L+_v.w_mde, _v.w_mds)
+
+                        full_optics = copy.deepcopy(self.optics)
+                        # Produce a new self.optics.arOpt and self.optics.arProp without last element included:
+                        del self.optics.arOpt[-1]
+                        del self.optics.arProp[-2:]
+
+                        f_name, f_ext = os.path.splitext(_v.ws_fni)
+                        _v.ws_fni = '{}_{}{}'.format(f_name, 'last_but_one', f_ext)
+
                     #int_ws = self.calc_wfr_prop(
                     int_ws, mesh_ws = self.calc_wfr_prop( #OC06122016
                         _wfr = wfr,
@@ -2020,6 +2034,34 @@ class SRWLBeamline(object):
                         _dep_type=3, #consider adding other cases (e.g. for TD FEL calculations)
                         _fname = os.path.join(_v.fdir, _v.ws_fni) if(len(_v.ws_fni) > 0) else '',
                         _det = detector)
+
+                    if _v.w_md:
+                        step_size = (multidrifts.max() - multidrifts.min()) / float(multidrifts.size - 1)
+                        precision = abs(int('{:.10E}'.format(step_size).split('E')[-1]))
+
+                        print('\n  Starting with multidrifts...\n')
+
+                        for drift in multidrifts:
+                            _v.ws_fni_drift = '{}_{:.{prec}f}m{}'.format(f_name, drift, f_ext, prec=precision)
+
+                            self.optics.arOpt = copy.deepcopy(full_optics.arOpt[-1:])
+                            self.optics.arOpt[-1].L = drift
+                            self.optics.arProp = copy.deepcopy(full_optics.arProp[-2:])
+
+                            # wfr_till_last_elem = copy.deepcopy(wfr)
+
+                            int_ws, mesh_ws = self.calc_wfr_prop(  # OC06122016
+                                _wfr=copy.deepcopy(wfr),
+                                _pres_ang=_v.ws_ap,
+                                _pol=_v.si_pol,
+                                _int_type=_v.si_type,
+                                _dep_type=3,  # consider adding other cases (e.g. for TD FEL calculations)
+                                _fname=os.path.join(_v.fdir, _v.ws_fni_drift) if (len(_v.ws_fni_drift) > 0) else '',
+                                _det=detector)
+
+                            print('Multidrift {:.{prec}f}m done, data saved to "{}"\n'.format(drift, _v.ws_fni_drift, prec=precision))
+                        print('  Finished all multidrifts\n')
+
                     #mesh_ws = wfr.mesh #OC06122016 (commented-out)
                     #if(len(_v.ws_fn) > 0): to implement saving single-e (/ fully coherent) wavefront data (wfr) to a file
 
