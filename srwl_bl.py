@@ -2046,12 +2046,13 @@ class SRWLBeamline(object):
                     #MR21092017
                     if run_multidrifts:
                         step_size = (max(multidrifts) - min(multidrifts)) / float(len(multidrifts) - 1)
-                        precision = abs(int('{:.10E}'.format(step_size).split('E')[-1]))
+                        precision_fname = abs(int('{:.10E}'.format(len(multidrifts)).split('E')[-1])) + 1
+                        precision_drift = abs(int('{:.10E}'.format(step_size).split('E')[-1]))
 
                         print('\n  Starting with multidrifts...\n')
 
-                        for drift in multidrifts:
-                            _v.ws_fni_drift = '{}_{:.{prec}f}m{}'.format(f_name, drift, f_ext, prec=precision)
+                        for i, drift in enumerate(multidrifts):
+                            _v.ws_fni_drift = '{}_{:0{prec}d}{}'.format(f_name, i+1, f_ext, prec=precision_fname)
 
                             self.optics.arOpt = copy.deepcopy(full_optics.arOpt[-1:])
                             self.optics.arOpt[-1].L = drift
@@ -2068,7 +2069,7 @@ class SRWLBeamline(object):
                                 _fname=os.path.join(_v.fdir, _v.ws_fni_drift) if (len(_v.ws_fni_drift) > 0) else '',
                                 _det=detector)
 
-                            print('Multidrift {:.{prec}f}m done, data saved to "{}"\n'.format(drift, _v.ws_fni_drift, prec=precision))
+                            print('Multidrift {:.{prec}f}m done, data saved to "{}"\n'.format(drift, _v.ws_fni_drift, prec=precision_drift))
                         print('  Finished all multidrifts\n')
 
                     #mesh_ws = wfr.mesh #OC06122016 (commented-out)
