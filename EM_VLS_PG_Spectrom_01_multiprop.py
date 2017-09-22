@@ -211,9 +211,9 @@ varParam = srwl_bl.srwl_uti_ext_options([
     ['w_y', 'f', 0.0, 'central vertical position [m] for calculation of intensity distribution vs horizontal and vertical position'],
     ['w_ry', 'f', 0.009, 'range of vertical position [m] for calculation of intensity distribution vs horizontal and vertical position'],
     ['w_ny', 'i', 100, 'number of points vs vertical position for calculation of intensity distribution'],
-    ['w_md', 'i', 1, 'enable/disable multidrift option'],
-    ['w_mde', 'f', 0.020, 'position of the last drift [m] after the initial drift'],
-    ['w_mds', 'i', 21, 'number of steps between the initial drift and the last drift'],
+    ['w_md', 'i', 1, 'enable/disable multidrift option'],                               # For Konstantine
+    ['w_mde', 'f', 0.020, 'position of the last drift [m] after the initial drift'],    # For Konstantine
+    ['w_mds', 'i', 21, 'number of steps between the initial drift and the last drift'], # For Konstantine
 
     ['w_smpf', 'f', 0.015, 'sampling factor for calculation of intensity distribution vs horizontal and vertical position'],
     
