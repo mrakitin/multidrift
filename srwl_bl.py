@@ -2013,14 +2013,17 @@ class SRWLBeamline(object):
 
                     #MR21092017
                     run_multidrifts = False
-                    if hasattr(_v, 'w_md') and _v.w_md and hasattr(_v, 'w_mde') and hasattr(_v, 'w_mds'):
+                    if hasattr(_v, 'w_md') and _v.w_md and ((hasattr(_v, 'w_mde') and hasattr(_v, 'w_mds')) or hasattr(_v, 'w_mdr')):
                         run_multidrifts = True
 
                     if run_multidrifts:
                         import copy
                         import numpy as np
 
-                        multidrifts = np.linspace(self.optics.arOpt[-1].L, self.optics.arOpt[-1].L+_v.w_mde, _v.w_mds)
+                        if hasattr(_v, 'w_mdr') and _v.w_mdr:
+                            multidrifts = _v.w_mdr
+                        else:
+                            multidrifts = np.linspace(self.optics.arOpt[-1].L, self.optics.arOpt[-1].L+_v.w_mde, _v.w_mds)
 
                         full_optics = copy.deepcopy(self.optics)
                         # Produce a new self.optics.arOpt and self.optics.arProp without last element included:
@@ -2042,7 +2045,7 @@ class SRWLBeamline(object):
 
                     #MR21092017
                     if run_multidrifts:
-                        step_size = (multidrifts.max() - multidrifts.min()) / float(multidrifts.size - 1)
+                        step_size = (max(multidrifts) - min(multidrifts)) / float(len(multidrifts) - 1)
                         precision = abs(int('{:.10E}'.format(step_size).split('E')[-1]))
 
                         print('\n  Starting with multidrifts...\n')
